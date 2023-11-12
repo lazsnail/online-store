@@ -22,15 +22,26 @@ export default function NavBar() {
 
 	return (
 		<div className="fixed w-full px-4 h-28 flex items-center justify-between bg-white text-black">
-			<Link onClick={() => showMenu && handleMenu()} href={"/"} className="p-3 hover:bg-black hover:text-white transition rounded-lg">
+			<Link
+				onClick={() => showMenu && handleMenu()}
+				href={"/"}
+				className="p-3 hover:bg-black hover:text-white transition rounded-lg"
+			>
 				Logo
 			</Link>
 
 			<div className="flex items-center gap-5">
-				<Link href={"/cart"} onClick={() => showMenu && handleMenu()} className="p-3 hover:bg-green-400 transition rounded-lg">
+				<Link
+					href={"/cart"}
+					onClick={() => showMenu && handleMenu()}
+					className="p-3 hover:bg-green-400 transition rounded-lg"
+				>
 					<BsCart2 size={30} />
 				</Link>
-				<button onClick={() => handleMenu()} className="p-3 hover:bg-blue-500 transition rounded-lg">
+				<button
+					onClick={() => handleMenu()}
+					className="p-3 hover:bg-blue-500 transition rounded-lg"
+				>
 					<GiHamburgerMenu size={30} />
 				</button>
 			</div>

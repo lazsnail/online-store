@@ -6,7 +6,7 @@ import {
 } from "@supabase/auth-helpers-nextjs";
 import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
 type Item = {
 	id: number;
@@ -38,17 +38,16 @@ export default function ItemPage({ params }: { params: { id: string } }) {
 		try {
 			// If the passed value is a callback function,
 			//  then call it with the existing state.
-            let data = window.localStorage.getItem("cart")
-            if (data) {
-                let cart = JSON.parse(data) as number[];
-                cart.push(item.id);
-                window.localStorage.setItem("cart", JSON.stringify(cart));
-                toast("Added item to cart")
-            }
-            else {
-                window.localStorage.setItem("cart", JSON.stringify([]))
-            }
-        } catch (error) {
+			let data = window.localStorage.getItem("cart");
+			if (data) {
+				let cart = JSON.parse(data) as number[];
+				cart.push(item.id);
+				window.localStorage.setItem("cart", JSON.stringify(cart));
+				toast("Added item to cart");
+			} else {
+				window.localStorage.setItem("cart", JSON.stringify([]));
+			}
+		} catch (error) {
 			console.log(error);
 		}
 	}
@@ -70,7 +69,11 @@ export default function ItemPage({ params }: { params: { id: string } }) {
 					Add to cart
 				</button>
 			</div>
-            <ToastContainer autoClose={1500} position="bottom-right" theme="dark"/>
+			<ToastContainer
+				autoClose={1500}
+				position="bottom-right"
+				theme="dark"
+			/>
 		</div>
 	);
 }

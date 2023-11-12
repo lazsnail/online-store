@@ -55,7 +55,7 @@ export default function CartPage() {
 			cart.splice(cart.indexOf(item), 1);
 			window.localStorage.setItem("cart", JSON.stringify(cart));
 			setCart(cart);
-            toast("Removed item from cart")
+			toast("Removed item from cart");
 		}
 	}
 
@@ -101,7 +101,11 @@ export default function CartPage() {
 						);
 					})}
 			</div>
-			<ToastContainer autoClose={1500} position="bottom-right" theme="dark"/>
+			<ToastContainer
+				autoClose={1500}
+				position="bottom-right"
+				theme="dark"
+			/>
 		</div>
 	);
 }
