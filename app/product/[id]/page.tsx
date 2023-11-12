@@ -1,11 +1,9 @@
 "use client";
 
-import {
-	createClientComponentClient,
-	createServerComponentClient,
-} from "@supabase/auth-helpers-nextjs";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useEffect, useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import Image from "next/image";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 type Item = {
@@ -21,7 +19,6 @@ export default function ItemPage({ params }: { params: { id: string } }) {
 
 	useEffect(() => {
 		const supabase = createClientComponentClient();
-
 		supabase
 			.from("store_items")
 			.select("*")
@@ -32,12 +29,10 @@ export default function ItemPage({ params }: { params: { id: string } }) {
 					console.error(error);
 				} else setData(data);
 			});
-	}, []);
+	}, [params]);
 
 	async function updateCart(item: Item) {
 		try {
-			// If the passed value is a callback function,
-			//  then call it with the existing state.
 			let data = window.localStorage.getItem("cart");
 			if (data) {
 				let cart = JSON.parse(data) as number[];
@@ -53,27 +48,32 @@ export default function ItemPage({ params }: { params: { id: string } }) {
 	}
 
 	return (
-		<div className="h-screen w-screen gap-10 flex bg-black text-white pt-28">
-			<div className="w-1/2 grid items-center justify-end">
-				<img width={200} height={200} src={data?.image_url} />
+		<div className="h-screen w-screen flex flex-col justify-center items-center gap-4 p-5 bg-black text-white pt-32">
+			<div className="flex flex-col sm:flex-row w-full justify-center items-center gap-4 ">
+				<div className="grid items-center justify-end">
+					<Image
+						width={200}
+						height={200}
+						src={data?.image_url ?? ""}
+						alt="Item image"
+					/>
+				</div>
+				<div className="flex flex-col gap-2 justify-center items-center text-center sm:text-left">
+					<span className="text-2xl font-bold w-full">
+						{data?.name}
+					</span>
+					<i className="w-full">{data?.description}</i>
+					<span className="w-full">${data?.price}</span>
+					<span className="w-full">In Stock</span>
+				</div>
 			</div>
-			<div className="flex flex-col gap-2 w-1/2 justify-center">
-				<span className="text-2xl font-bold w-full">{data?.name}</span>
-				<i>{data?.description}</i>
-				<span>${data?.price}</span>
-				<span className="w-full">In Stock</span>
-				<button
-					onClick={() => data && updateCart(data)}
-					className="border-2 border-white w-fit p-2 hover:bg-white hover:text-black transition"
-				>
-					Add to cart
-				</button>
-			</div>
-			<ToastContainer
-				autoClose={1500}
-				position="bottom-right"
-				theme="dark"
-			/>
+
+			<button
+				onClick={() => data && updateCart(data)}
+				className="border-2 border-white w-fit p-2 hover:bg-white hover:text-black transition"
+			>
+				Add to cart
+			</button>
 		</div>
 	);
 }

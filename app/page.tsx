@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import background from "../public/RE.jpeg";
 import mosaic from "../public/mosaic.jpg";
 import Link from "next/link";
+import Image from "next/image";
 
 export default async function Home() {
 	const supabase = createServerComponentClient({ cookies });
@@ -14,8 +15,6 @@ export default async function Home() {
 	if (error) {
 		console.log(error);
 	}
-
-	console.log(store_items);
 
 	return (
 		<main className="flex min-h-screen flex-col items-center">
@@ -70,13 +69,14 @@ export default async function Home() {
 						store_items.map((item, index) => (
 							<div
 								key={index}
-								className="w-fit p-3 text-black border-2 border-white rounded-lg flex flex-col items-center gap-3"
+								className="w-fit min-w-[180px] p-3 text-black border-2 border-white rounded-lg flex flex-col items-center gap-3"
 							>
-								<img
+								<Image
 									src={item.image_url}
-									alt="product image"
-									className="w-24"
-								></img>
+                                    width={96}
+                                    height={96}
+									alt="Product image"
+								></Image>
 								<span className="text-lg font-bold text-white">
 									{item.name}
 								</span>

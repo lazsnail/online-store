@@ -2,8 +2,9 @@
 
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 type Item = {
@@ -15,97 +16,118 @@ type Item = {
 };
 
 export default function CartPage() {
-	const [cart, setCart] = useState([]);
-	const [items, setItems] = useState<Item[]>();
+	const [cart, setCart] = useState<number[]>([]);
+	const [storeItems, setStoreItems] = useState<Item[]>([]);
+	const [totalPrice, setTotalPrice] = useState(0);
 
 	useEffect(() => {
 		const data = window.localStorage.getItem("cart");
 		if (data) {
-			let cart = JSON.parse(data);
-			console.log(cart);
-			setCart(cart);
+			setCart(JSON.parse(data) as number[]);
 		} else {
 			window.localStorage.setItem("cart", JSON.stringify([]));
 			setCart([]);
 		}
 
 		const supabase = createClientComponentClient();
-
 		supabase
 			.from("store_items")
 			.select("*")
 			.then(({ data, error }) => {
 				if (error) {
 					console.error(error);
-				} else setItems(data);
+				} else {
+					setStoreItems(data as Item[]);
+				}
 			});
 	}, []);
 
+	useEffect(() => {
+		let x = 0;
+		for (let i = 0; i < cart.length; i++) {
+			const storeItem = storeItems.find((x) => x.id === cart[i]);
+			x += storeItem?.price ?? 0;
+		}
+		setTotalPrice(x);
+	}, [cart, storeItems]);
+
 	function clearCart(): void {
-		window.localStorage.setItem("cart", JSON.stringify([]));
-		setCart([]);
+		try {
+			window.localStorage.setItem("cart", JSON.stringify([]));
+			setCart([]);
+			setTotalPrice(0);
+		} catch (error) {
+			toast.error("Error accessing cart");
+		}
 	}
 
-	function removeItem(item: never) {
-		console.log(item);
-		const data = window.localStorage.getItem("cart");
-		if (data) {
-			let cart = JSON.parse(data);
-			console.log(cart.indexOf(item));
-			cart.splice(cart.indexOf(item), 1);
-			window.localStorage.setItem("cart", JSON.stringify(cart));
-			setCart(cart);
-			toast("Removed item from cart");
+	function removeItem(item: number) {
+		try {
+			const data = window.localStorage.getItem("cart");
+			if (data) {
+				let cart = JSON.parse(data);
+				cart.splice(cart.indexOf(item), 1);
+				window.localStorage.setItem("cart", JSON.stringify(cart));
+				setCart(cart);
+				toast("Removed item from cart");
+			} else {
+				toast.error("Error accessing cart");
+			}
+		} catch (error) {
+			toast.error("Error accessing cart");
 		}
 	}
 
 	return (
-		<div className="w-screen h-screen pt-28 bg-black text-white">
+		<div className="w-screen h-screen pt-28 flex flex-col bg-black text-white p-2">
 			<h1 className="text-2xl text-center mt-8 font-bold">Your Cart</h1>
 			<button
-				className="my-3 ml-2 border-2 border-white p-2"
+				className="my-3 w-fit border-2 border-white p-2 hover:bg-white hover:text-black transition"
 				onClick={() => clearCart()}
 			>
 				Clear cart
 			</button>
-			<div className="flex flex-wrap gap-4 p-2">
-				{cart.length === 0 && (
-					<span className="p-2">Cart is empty</span>
-				)}
+			<span>
+				Total Price: <b>${totalPrice}</b>
+			</span>
+			<div className="flex flex-wrap gap-4 mt-2">
+				{cart.length === 0 && <span className="">Cart is empty</span>}
 				{cart.length > 0 &&
 					cart.map((item, index) => {
-						const store_item = items?.find((x) => x.id === item);
+						const storeItem = storeItems.find((x) => x.id === item);
 
 						return (
 							<div
 								key={index}
-								className="flex p-2 w-fit gap-4 border-2 border-white"
+								className="flex items-center p-2 w-fit gap-4 border-2 border-white"
 							>
 								<button
 									onClick={() => {
 										removeItem(item);
 									}}
+									className="hover:bg-white hover:text-black transition p-2"
 								>
 									X
 								</button>
-								<span>${store_item?.price}</span>
+								<Image
+									width={50}
+									height={50}
+									src={storeItem?.image_url ?? ""}
+									alt="Item image"
+								></Image>
+								<span>${storeItem?.price}</span>
 								<Link
 									href={`/product/${encodeURIComponent(
 										item
 									)}`}
-									className="font-bold"
+									className="font-bold hover:bg-white hover:text-black transition p-2"
 								>
-									{store_item?.name}
+									{storeItem?.name}
 								</Link>
 							</div>
 						);
 					})}
 			</div>
-			<ToastContainer
-				autoClose={1500}
-				position="bottom-right"
-				theme="dark"
-			/>
 		</div>
 	);
 }
